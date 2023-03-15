@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import Clock from 'react-live-clock'
+import ReactDatePicker from 'react-datepicker'
 import {
   getFirestore,
   addDoc,
@@ -8,15 +9,18 @@ import {
   where,
   getDocs,
   limitToLast,
-  orderBy
+  orderBy,
+  QuerySnapshot,
+  DocumentData
 } from 'firebase/firestore'
 import { getAuth, signInWithPopup, OAuthProvider, User, signOut } from 'firebase/auth'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import app from '../../firebase/clientApp'
 import moment from 'moment'
 import 'bootswatch/dist/flatly/bootstrap.min.css'
-import { useState } from 'react'
-import LogButton from '@/LogButton'
+import 'react-datepicker/dist/react-datepicker.css'
+import { useEffect, useState } from 'react'
+import LogsTable from '@/LogsTable'
 
 const provider = new OAuthProvider('microsoft.com')
 provider.setCustomParameters({
@@ -24,9 +28,10 @@ provider.setCustomParameters({
 })
 const auth = getAuth(app)
 const db = getFirestore(app)
-export default function Home() {
+export default function Admin() {
   const [user, loading, error] = useAuthState(auth)
-  const [hasCurrentLog, setCurrentLog] = useState(false)
+  const [startDate, setDate] = useState<Date | any>(new Date())
+  const [userLogs, setUserLogs] = useState<QuerySnapshot<DocumentData> | undefined>(undefined)
   const logout = async () => {
     await addDoc(collection(db, 'logs'), {
       uid: user?.uid,
@@ -37,49 +42,33 @@ export default function Home() {
 
     signOut(auth)
       .then(() => {
-        setCurrentLog(false)
         return 'Successfull Logout'
       })
       .catch(error => console.log(error))
   }
-  const handleTimeLog = (out?: boolean): void => {
-    if (out && user) {
-      logout().then(msg => console.log(msg))
-    } else {
-      signInWithPopup(auth, provider)
-        .then(async result => {
-          // Insert logs here
-          const currentTime = moment().toISOString()
-
-          await addDoc(collection(db, 'logs'), {
-            uid: result.user.uid,
-            name: result.user.displayName,
-            loginTime: currentTime,
-            logoutTime: ''
-          })
-          setCurrentLog(true)
-        })
-        .catch(error => console.log(error))
-    }
+  const handleAdminLogin = (): void => {
+    signInWithPopup(auth, provider)
+      .then(async result => {
+        // Insert logs here
+        getLogs()
+      })
+      .catch(error => console.log(error))
   }
   const getLogs = async () => {
+    // Get current date in Date ISO
+    const dateFormat = 'YYYY-MM-DD'
     const q = query(
       collection(db, 'logs'),
-      where('uid', '==', user ? user.uid : ''),
-      orderBy('loginTime'),
-      limitToLast(1)
+      where('loginTime', '>=', moment(startDate).format(dateFormat)),
+      where('loginTime', '<=', moment(startDate).add(1, 'days').format(dateFormat))
     )
     const snapshot = await getDocs(q)
-
-    snapshot.forEach(doc => {
-      const lastLogin = moment(doc.data().loginTime)
-      const diff = moment(new Date()).diff(lastLogin, 'days')
-      setCurrentLog(diff <= 0)
-    })
+    setUserLogs(snapshot)
   }
-  // Get the doc based on user
-  // Compare login date if same day or not
-  getLogs()
+
+  useEffect(() => {
+    getLogs()
+  }, [startDate])
   return (
     <>
       <Head>
@@ -95,14 +84,32 @@ export default function Home() {
             src='https://www.23point5.com/imgs/app/23Point5_Logo_Black_RGB.svg'
             alt='23point'
           />
+          <div>
+            <button onClick={() => handleAdminLogin()} className='btn btn-primary'>
+              Admin Login
+            </button>
+          </div>
           <h1 className={`superLargeText`}>
             <Clock format={'HH:mm:ss'} ticking={true} />
           </h1>
-          {loading ? (
-            <span>Loading...</span>
-          ) : (
-            <LogButton user={user} hasCurrentLog={hasCurrentLog} clickHandler={handleTimeLog} />
-          )}
+          <div>
+            <div style={{ width: '20%', margin: '0 auto', marginBottom: '2rem' }}>
+              <button
+                type='button'
+                className='btn btn-outline-info'
+                style={{ marginBottom: '10px' }}
+              >
+                {moment(startDate).format('MMMM Do YYYY, dddd')}
+              </button>
+              <ReactDatePicker
+                selected={startDate}
+                onChange={date => setDate(date)}
+                className='form-control-lg'
+              />
+            </div>
+
+            {user && !loading && <LogsTable data={userLogs} />}
+          </div>
         </div>
       </main>
     </>

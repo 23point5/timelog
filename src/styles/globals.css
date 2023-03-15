@@ -2,8 +2,11 @@
   text-align: center;
 }
 .top10 {
-  margin-top: 10%;
+  margin-top: 7%;
 }
 .superLargeText {
   font-size: 10rem;
+}
+.react-datepicker__input-container input {
+  width: 100%;
 }
