@@ -92,24 +92,24 @@ export default function Admin() {
           <h1 className={`superLargeText`}>
             <Clock format={'HH:mm:ss'} ticking={true} />
           </h1>
-          <div>
-            <div style={{ width: '20%', margin: '0 auto', marginBottom: '2rem' }}>
-              <button
-                type='button'
-                className='btn btn-outline-info'
-                style={{ marginBottom: '10px' }}
-              >
-                {moment(startDate).format('MMMM Do YYYY, dddd')}
-              </button>
-              <ReactDatePicker
-                selected={startDate}
-                onChange={date => setDate(date)}
-                className='form-control-lg'
-              />
+          {user && !loading && (
+            <div>
+              <div style={{ width: '20%', margin: '0 auto', marginBottom: '2rem' }}>
+                <button
+                  type='button'
+                  className='btn btn-outline-info'
+                  style={{ marginBottom: '10px' }}
+                >
+                  {moment(startDate).format('MMMM Do YYYY, dddd')}
+                </button>
+                <ReactDatePicker
+                  selected={startDate}
+                  onChange={date => setDate(date)}
+                  className='form-control-lg'
+                />
+              </div>
             </div>
-
-            {user && !loading && <LogsTable data={userLogs} />}
-          </div>
+          )}
         </div>
       </main>
     </>
