@@ -108,6 +108,8 @@ export default function Admin() {
                   className='form-control-lg'
                 />
               </div>
+
+              {user && !loading && <LogsTable data={userLogs} />}
             </div>
           )}
         </div>
