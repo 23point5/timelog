@@ -17,6 +17,7 @@ import moment from 'moment'
 import 'bootswatch/dist/flatly/bootstrap.min.css'
 import { useState } from 'react'
 import LogButton from '@/LogButton'
+import BrandLogo from '@/brandLogo'
 
 const provider = new OAuthProvider('microsoft.com')
 provider.setCustomParameters({
@@ -90,11 +91,7 @@ export default function Home() {
       </Head>
       <main>
         <div className='container top10'>
-          <img
-            style={{ width: '200px', marginBottom: '1rem' }}
-            src='https://www.23point5.com/imgs/app/23Point5_Logo_Black_RGB.svg'
-            alt='23point'
-          />
+          <BrandLogo />
           <h1 className={`superLargeText`}>
             <Clock format={'HH:mm:ss'} ticking={true} />
           </h1>

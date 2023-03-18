@@ -24,7 +24,7 @@ const LogsTable: React.FC<iProps> = ({ data }) => {
       const isOut =
         doc.data().logoutTime !== '' || loginDate.format(dateFormat) !== moment().format(dateFormat)
       rowElements.push(
-        <tr>
+        <tr key={doc.data().uid}>
           <th scope='row'>{doc.data().name}</th>
           <td>{timeLog}</td>
           <td>
