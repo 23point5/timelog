@@ -17,7 +17,7 @@ import moment from 'moment'
 import 'bootswatch/dist/flatly/bootstrap.min.css'
 import { useState } from 'react'
 import LogButton from '@/LogButton'
-import BrandLogo from '@/brandLogo'
+import BrandLogo from '@/BrandLogo'
 
 const provider = new OAuthProvider('microsoft.com')
 provider.setCustomParameters({

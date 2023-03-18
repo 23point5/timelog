@@ -22,8 +22,7 @@ import 'bootswatch/dist/flatly/bootstrap.min.css'
 import 'react-datepicker/dist/react-datepicker.css'
 import { useEffect, useState } from 'react'
 import LogsTable from '@/LogsTable'
-import { isAdmin } from '@firebase/util'
-import BrandLogo from '@/brandLogo'
+import BrandLogo from '@/BrandLogo'
 
 const provider = new OAuthProvider('microsoft.com')
 provider.setCustomParameters({
